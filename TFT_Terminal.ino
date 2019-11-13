@@ -29,10 +29,11 @@
 #define TEXT_HEIGHT 16 // Height of text to be printed and scrolled
 #define TOP_FIXED_AREA 14 // Number of lines in top fixed area (lines counted from top of screen)
 #define BOT_FIXED_AREA 0 // Number of lines in bottom fixed area (lines counted from bottom of screen)
-#define YMAX 240 // Bottom of screen area
+#define YMAX 80 // Bottom of screen area
+#define XMAX 160
 
 // The initial y coordinate of the top of the scrolling area
-uint16_t yStart = 16;
+uint16_t yStart = 0;
 // yArea must be a integral multiple of TEXT_HEIGHT
 uint16_t yArea = YMAX-TOP_FIXED_AREA-BOT_FIXED_AREA;
 // The initial y coordinate of the top of the bottom text line
@@ -94,7 +95,7 @@ void termPutchar(unsigned char data) {
   {
     // data = Serial.read();
     // If it is a CR or we are near end of line then scroll one line
-    if (data == '\r' || xPos>311) {
+    if (data == '\r' || xPos>=XMAX) {
       xPos = 0;
       yDraw = scroll_line(); // It can take 13ms to scroll and blank 16 pixel lines
     }
@@ -118,7 +119,7 @@ int scroll_line() {
   int yTemp = yStart; // Store the old yStart, this is where we draw the next line
   // Use the record of line lengths to optimise the rectangle size we need to erase the top line
   // M5.Lcd.fillRect(0,yStart,blank[(yStart-TOP_FIXED_AREA)/TEXT_HEIGHT],TEXT_HEIGHT, TFT_BLACK);
-  M5.Lcd.fillRect(0,yStart,320,TEXT_HEIGHT, TFT_BLACK);
+  M5.Lcd.fillRect(0,yStart,XMAX,TEXT_HEIGHT, TFT_BLACK);
 
   // Change the top of the scroll area
   yStart+=TEXT_HEIGHT;
@@ -135,7 +136,7 @@ int scroll_line() {
 // ##############################################################################################
 // We are using a hardware feature of the display, so we can only scroll in portrait orientation
 void setupScrollArea(uint16_t tfa, uint16_t bfa) {
-//!!  M5.Lcd.writecommand(ILI9341_VSCRDEF); // Vertical scroll definition
+  M5.Lcd.writecommand(ST7735_VSCRDEF); // Vertical scroll definition
   M5.Lcd.writedata(tfa >> 8);           // Top Fixed Area line count
   M5.Lcd.writedata(tfa);
   M5.Lcd.writedata((YMAX-tfa-bfa)>>8);  // Vertical Scrolling Area line count
@@ -148,7 +149,7 @@ void setupScrollArea(uint16_t tfa, uint16_t bfa) {
 // Setup the vertical scrolling start address pointer
 // ##############################################################################################
 void scrollAddress(uint16_t vsp) {
-//!!  M5.Lcd.writecommand(ILI9341_VSCRSADD); // Vertical scrolling pointer
+  M5.Lcd.writecommand(ST7735_VSCRDEF); // Vertical scrolling pointer
   M5.Lcd.writedata(vsp>>8);
   M5.Lcd.writedata(vsp);
 }
