@@ -26,8 +26,8 @@
 #include <M5StickC.h>
 
 // The scrolling area must be a integral multiple of TEXT_HEIGHT
-#define TEXT_HEIGHT 16 // Height of text to be printed and scrolled
-#define TOP_FIXED_AREA 14 // Number of lines in top fixed area (lines counted from top of screen)
+#define TEXT_HEIGHT 8 // Height of text to be printed and scrolled
+#define TOP_FIXED_AREA 0 // Number of lines in top fixed area (lines counted from top of screen)
 #define BOT_FIXED_AREA 0 // Number of lines in bottom fixed area (lines counted from bottom of screen)
 #define YMAX 80 // Bottom of screen area
 #define XMAX 160
@@ -58,7 +58,9 @@ int blank[19]; // We keep all the strings pixel lengths to optimise the speed of
 void termInit() {
   // Setup the TFT display
   // M5.begin();
+  M5.Axp.ScreenBreath(8);   // screen brightness (7-15)
   M5.Lcd.setRotation(3);
+  M5.Lcd.setTextFont(1);    // Adafruit 8pixel ASCII font
   M5.Lcd.fillScreen(TFT_BLACK);
   
   // Setup baud rate and draw top banner
@@ -69,11 +71,10 @@ void termInit() {
   // M5.Lcd.drawCentreString(" Serial Terminal - 115200 baud ",320/2,0,2);
 
   // Change colour for scrolling zone text
-  M5.Lcd.setTextColor(WHITE, TFT_BLACK);
+  M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
 
   // Setup scroll area
-  // setupScrollArea(TOP_FIXED_AREA, BOT_FIXED_AREA);
-  setupScrollArea(0, 0);
+  setupScrollArea(TOP_FIXED_AREA, BOT_FIXED_AREA);
 
   // Zero the array
   // for (byte i = 0; i<18; i++) blank[i]=0;
@@ -100,7 +101,7 @@ void termPutchar(unsigned char data) {
       yDraw = scroll_line(); // It can take 13ms to scroll and blank 16 pixel lines
     }
     if (data > 31 && data < 128) {
-      xPos += M5.Lcd.drawChar(data,xPos,yDraw,2);
+      xPos += M5.Lcd.drawChar(data,xPos,yDraw);
       // blank[(18+(yStart-TOP_FIXED_AREA)/TEXT_HEIGHT)%19]=xPos; // Keep a record of line lengths
     }
     //change_colour = 1; // Line to indicate buffer is being emptied
@@ -149,7 +150,7 @@ void setupScrollArea(uint16_t tfa, uint16_t bfa) {
 // Setup the vertical scrolling start address pointer
 // ##############################################################################################
 void scrollAddress(uint16_t vsp) {
-  M5.Lcd.writeCommand(ST7735_VSCRSADD); // Vertical scrolling start address
+/*  M5.Lcd.writecommand(ST7735_VSCRSADD); // Vertical scrolling start address
   M5.Lcd.writedata(vsp>>8);
-  M5.Lcd.writedata(vsp);
+  M5.Lcd.writedata(vsp);*/
 }
