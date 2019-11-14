@@ -140,7 +140,7 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 // okay, this is a hack for now
 // if we're in here, we're a DUE probably (ARM instead of AVR)
 
-#define RAMEND 4096-1
+#define RAMEND 65536   // for M5StickC
 
 // turn off EEProm
 #undef ENABLE_EEPROM
@@ -210,6 +210,9 @@ FILE * fp;
 // functions defined elsehwere
 void cmd_Files( void );
 #endif
+
+// CardKB HAT I2C address
+#define CARDKB_ADDR 0x5F
 
 ////////////////////
 
@@ -1949,7 +1952,7 @@ void setup()
 #ifdef ARDUINO
   // Serial.begin(kConsoleBaud);	// opens serial port
   M5.begin();
-  Wire.begin(); // 加入 i2c 总线，作为主机
+  Wire.begin(0, 26);  // initialize CardKB HAT I2C
   termInit();
 
   // while( !Serial ); // for Leonardo
@@ -2124,11 +2127,23 @@ static int inchar()
   default:
     while(1)
     {
-      Wire.requestFrom(0x88, 1);
-      if(Wire.available()) { // slave may send less than requested
-        char c = Wire.read(); // receive a byte as character
-        if(c!=0) {
-          return c;
+      // for CardKB HAT
+      Wire.requestFrom(CARDKB_ADDR, 1);
+      while(Wire.available())
+      {
+        char c = Wire.read(); // receive a byte as characterif
+        if (c != 0)
+        {
+          //TODO convert special chars
+          // cursor (left -> bs)
+          switch(c){
+            case 0x98:
+              c = 0x08;
+              break;
+          }
+          if(c < 0x80){
+            return c;
+          }
         }
       }
       delay(10);
