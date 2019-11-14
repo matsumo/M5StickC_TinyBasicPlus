@@ -15,3 +15,12 @@ https://github.com/m5stack/M5StickC/blob/master/examples/Advanced/Display/TFT_Te
 ArduinoBasic_cardKB/ArduinoBASIC_CardKB at master · KeiTakagi/ArduinoBasic_cardKB
 https://github.com/KeiTakagi/ArduinoBasic_cardKB/tree/master/ArduinoBASIC_CardKB
 
+
+kmaepu/ESP32_SPIFFS
+https://github.com/kmaepu/ESP32_SPIFFS
+
+
+vintagechips/ttbasic_arduino: TOYOSHIKI Tiny BASIC for Arduino. Tested in Arduino Uno.
+https://github.com/vintagechips/ttbasic_arduino
+
+
