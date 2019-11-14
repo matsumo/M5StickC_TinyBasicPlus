@@ -1955,6 +1955,9 @@ void setup()
   Wire.begin(0, 26);  // initialize CardKB HAT I2C
   termInit();
 
+  pinMode(M5_BUTTON_HOME, INPUT);
+  pinMode(M5_BUTTON_RST, INPUT);
+
   // while( !Serial ); // for Leonardo
   
   Serial.println( sentinel );
@@ -2071,7 +2074,12 @@ void setup()
 /***********************************************************/
 static unsigned char breakcheck(void)
 {
-// #ifdef ARDUINO
+#ifdef ARDUINO
+  if(digitalRead(M5_BUTTON_RST) == LOW){
+    while(digitalRead(M5_BUTTON_RST) == LOW);
+    return 1;
+  }
+  return 0;
   // Wire.requestFrom(0x88, 1);
   // if(Wire.available())
   //   return Wire.read() == CTRLC;
@@ -2081,14 +2089,14 @@ static unsigned char breakcheck(void)
   //   return Serial.read() == CTRLC;
   // return 0;
 
-// #else
+#else
 #ifdef __CONIO__
   if(kbhit())
     return getch() == CTRLC;
   else
 #endif
     return 0;
-// #endif
+#endif
 }
 /***********************************************************/
 static int inchar()
