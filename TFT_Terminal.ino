@@ -58,7 +58,7 @@ int blank[19]; // We keep all the strings pixel lengths to optimise the speed of
 void termInit() {
   // Setup the TFT display
   // M5.begin();
-  // M5.Lcd.setRotation(5); // Must be setRotation(0) for this sketch to work correctly
+  M5.Lcd.setRotation(3);
   M5.Lcd.fillScreen(TFT_BLACK);
   
   // Setup baud rate and draw top banner
@@ -69,7 +69,7 @@ void termInit() {
   // M5.Lcd.drawCentreString(" Serial Terminal - 115200 baud ",320/2,0,2);
 
   // Change colour for scrolling zone text
-  M5.Lcd.setTextColor(GREEN, TFT_BLACK);
+  M5.Lcd.setTextColor(WHITE, TFT_BLACK);
 
   // Setup scroll area
   // setupScrollArea(TOP_FIXED_AREA, BOT_FIXED_AREA);
