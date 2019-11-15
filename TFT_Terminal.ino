@@ -100,6 +100,9 @@ void termPutchar(unsigned char data) {
       xPos = 0;
       yDraw = scroll_line(); // It can take 13ms to scroll and blank 16 pixel lines
     }
+    if(data == '\b' && xPos > 6){
+      xPos -= 6;
+    }
     if (data > 31 && data < 128) {
       xPos += M5.Lcd.drawChar(data,xPos,yDraw);
       // blank[(18+(yStart-TOP_FIXED_AREA)/TEXT_HEIGHT)%19]=xPos; // Keep a record of line lengths
