@@ -99,13 +99,13 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 
 // This enables LOAD, SAVE, FILES commands through the Arduino SD Library
 // it adds 9k of usage as well.
-//#define ENABLE_FILEIO 1
-#undef ENABLE_FILEIO
+#define ENABLE_FILEIO 1
+//#undef ENABLE_FILEIO
 
 // this turns on "autorun".  if there's FileIO, and a file "autorun.bas",
 // then it will load it and run it when starting up
-//#define ENABLE_AUTORUN 1
-#undef ENABLE_AUTORUN
+#define ENABLE_AUTORUN 1
+//#undef ENABLE_AUTORUN
 // and this is the file that gets run
 #define kAutorunFilename  "autorun.bas"
 
@@ -161,13 +161,12 @@ int eepos = 0;
 
 
 #ifdef ENABLE_FILEIO
-#include <SD.h>
-#include <SPI.h> /* needed as of 1.5 beta */
+#include <SPIFFS.h>
 #include <fs.h> 
 
 // Arduino-specific configuration
 // set this to the card select for your SD shield
-#define kSD_CS 4
+//#define kSD_CS 4
 
 #define kSD_Fail  0
 #define kSD_OK    1
@@ -670,7 +669,7 @@ static void getln(char prompt)
         break;
       txtpos--;
 
-      printmsg(backspacemsg);
+      printmsgNoNL(backspacemsg);
       break;
     default:
       // We need to leave at least one space to allow us to shuffle the line into order
@@ -1769,13 +1768,13 @@ load:
 
 #ifdef ARDUINO
     // Arduino specific
-    if( !SD.exists( (char *)filename ))
+    if( !SPIFFS.exists( (char *)filename ))
     {
       printmsg( sdfilemsg );
     } 
     else {
 
-      fp = SD.open( (const char *)filename );
+      fp = SPIFFS.open( (const char *)filename );
       inStream = kStreamFile;
       inhibitOutput = true;
     }
@@ -1806,12 +1805,12 @@ save:
 
 #ifdef ARDUINO
     // remove the old file if it exists
-    if( SD.exists( (char *)filename )) {
-      SD.remove( (char *)filename );
+    if( SPIFFS.exists( (char *)filename )) {
+      SPIFFS.remove( (char *)filename );
     }
 
     // open the file, switch over to file output
-    fp = SD.open( (const char *)filename, FILE_WRITE );
+    fp = SPIFFS.open( (const char *)filename, FILE_WRITE );
     outStream = kStreamFile;
 
     // copied from "List"
@@ -1906,6 +1905,7 @@ static int isValidFnChar( char c )
   if( c == '+' ) return 1;
   if( c == '.' ) return 1;
   if( c == '~' ) return 1;  // Window~1.txt
+  if( c == '/' ) return 1;
 
   return 0;
 }
@@ -2042,9 +2042,9 @@ void setup()
   initSD();
   
 #ifdef ENABLE_AUTORUN
-  if( SD.exists( kAutorunFilename )) {
+  if( SPIFFS.exists( kAutorunFilename )) {
     program_end = program_start;
-    fp = SD.open( kAutorunFilename );
+    fp = SPIFFS.open( kAutorunFilename );
     inStream = kStreamFile;
     inhibitOutput = true;
     runAfterLoad = true;
@@ -2158,7 +2158,7 @@ static int inchar()
     }
   }
   
-// inchar_loadfinish:
+inchar_loadfinish:
   inStream = kStreamSerial;
   inhibitOutput = false;
 
@@ -2224,9 +2224,9 @@ static int initSD( void )
 
   // due to the way the SD Library works, pin 10 always needs to be 
   // an output, even when your shield uses another line for CS
-  pinMode(10, OUTPUT); // change this to 53 on a mega
+//  pinMode(10, OUTPUT); // change this to 53 on a mega
 
-  if( !SD.begin( kSD_CS )) {
+  if(!SPIFFS.begin()){
     // failed
     printmsg( sderrormsg );
     return kSD_Fail;
@@ -2246,7 +2246,7 @@ static int initSD( void )
 #if ENABLE_FILEIO
 void cmd_Files( void )
 {
-  File dir = SD.open( "/" );
+  File dir = SPIFFS.open( "/" );
   dir.seek(0);
 
   while( true ) {
