@@ -30,7 +30,7 @@
 #define TOP_FIXED_AREA 0 // Number of lines in top fixed area (lines counted from top of screen)
 #define BOT_FIXED_AREA 0 // Number of lines in bottom fixed area (lines counted from bottom of screen)
 #define YMAX 80 // Bottom of screen area
-#define XMAX 160
+#define XMAX 156
 
 // The initial y coordinate of the top of the scrolling area
 uint16_t yStart = 0;
