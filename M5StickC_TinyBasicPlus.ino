@@ -108,12 +108,12 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 #define ENABLE_AUTORUN 1
 //#undef ENABLE_AUTORUN
 // and this is the file that gets run
-#define kAutorunFilename  "autorun.bas"
+#define kAutorunFilename  kSpiffsFolder "autorun.bas"
 
 // this is the alternate autorun.  Autorun the program in the eeprom.
 // it will load whatever is in the EEProm and run it
 #define ENABLE_EAUTORUN 1
-//#undef ENABLE_EAUTORUN
+#undef ENABLE_EAUTORUN
 
 // this will enable the "TONE", "NOTONE" command using a piezo
 // element on the specified pin.  Wire the red/positive/piezo to the kPiezoPin,
