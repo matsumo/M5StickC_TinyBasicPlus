@@ -101,6 +101,7 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 // it adds 9k of usage as well.
 #define ENABLE_FILEIO 1
 //#undef ENABLE_FILEIO
+#define kSpiffsFolder "/tinybasic/"
 
 // this turns on "autorun".  if there's FileIO, and a file "autorun.bas",
 // then it will load it and run it when starting up
@@ -1767,14 +1768,16 @@ load:
       goto qwhat;
 
 #ifdef ARDUINO
+    String f = kSpiffsFolder;
+    f.concat((char *)filename);
     // Arduino specific
-    if( !SPIFFS.exists( (char *)filename ))
+    if( !SPIFFS.exists( f.c_str() ))
     {
       printmsg( sdfilemsg );
     } 
     else {
 
-      fp = SPIFFS.open( (const char *)filename );
+      fp = SPIFFS.open( (const char *)f.c_str() );
       inStream = kStreamFile;
       inhibitOutput = true;
     }
@@ -1804,13 +1807,15 @@ save:
       goto qwhat;
 
 #ifdef ARDUINO
+    String f = kSpiffsFolder;
+    f.concat((char *)filename);
     // remove the old file if it exists
-    if( SPIFFS.exists( (char *)filename )) {
-      SPIFFS.remove( (char *)filename );
+    if( SPIFFS.exists( f.c_str() )) {
+      SPIFFS.remove( f.c_str() );
     }
 
     // open the file, switch over to file output
-    fp = SPIFFS.open( (const char *)filename, FILE_WRITE );
+    fp = SPIFFS.open( f.c_str(), FILE_WRITE );
     outStream = kStreamFile;
 
     // copied from "List"
@@ -1905,7 +1910,6 @@ static int isValidFnChar( char c )
   if( c == '+' ) return 1;
   if( c == '.' ) return 1;
   if( c == '~' ) return 1;  // Window~1.txt
-  if( c == '/' ) return 1;
 
   return 0;
 }
@@ -2255,28 +2259,31 @@ void cmd_Files( void )
       entry.close();
       break;
     }
+    String f = entry.name();
+    if(!f.startsWith(kSpiffsFolder)) continue;
+    f.replace(kSpiffsFolder, "");
 
     // common header
     printmsgNoNL( indentmsg );
-    printmsgNoNL( (const unsigned char *)entry.name() );
-    if( entry.isDirectory() ) {
+    printmsgNoNL( (const unsigned char *)f.c_str() );
+/*    if( entry.isDirectory() ) {
       printmsgNoNL( slashmsg );
     }
 
     if( entry.isDirectory() ) {
       // directory ending
-      for( int i=strlen( entry.name()) ; i<16 ; i++ ) {
+      for( int i=f.length() ; i<16 ; i++ ) {
         printmsgNoNL( spacemsg );
       }
       printmsgNoNL( dirextmsg );
     }
-    else {
+    else {*/
       // file ending
-      for( int i=strlen( entry.name()) ; i<17 ; i++ ) {
+      for( int i=f.length() ; i<17 ; i++ ) {
         printmsgNoNL( spacemsg );
       }
       printUnum( entry.size() );
-    }
+//    }
     line_terminator();
     entry.close();
   }
