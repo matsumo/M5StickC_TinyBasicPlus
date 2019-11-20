@@ -1982,7 +1982,7 @@ void setup()
 //  " |_|  |_|____/ \r\n"
 //   ;
 
-  const unsigned char initLogo[] =
+/*  const unsigned char initLogo[] =
   "__  __ ____ ____  _             _   \r\n"
   "|  \\/  | ___/ ___|| |_ __ _  ___| | __\r\n"
   "| |\\/| |___ \\___ \\| __/ _` |/ __| |/ / \r\n"
@@ -1997,10 +1997,11 @@ void setup()
   "## ### ## #######   ######     ##    ##     ## ##       #####    \r\n"
   "##     ##       ##       ##    ##    ######### ##       ##  ##   \r\n"
   "##     ## ##    ## ##    ##    ##    ##     ## ##    ## ##   ##  \r\n"
-  "##     ##  ######   ######     ##    ##     ##  ######  ##    ##";
+  "##     ##  ######   ######     ##    ##     ##  ######  ##    ##";*/
 
   const unsigned char initLogok[] = 
-  "##       ## ######## \r\n"
+  "M5StickC\r\n";
+/*  "##       ## ######## \r\n"
   "###    ### ##       \r\n"
   "#### #### ##       \r\n"
   "## ### ##  #######  \r\n"
@@ -2033,12 +2034,12 @@ void setup()
 "  iDD            DG  \r\n"
 "      DD        DD    \r\n"
 "        DD    DG      \r\n"
-"          GDDD        \r\n";
+"          GDDD        \r\n";*/
 
   // M5.Lcd.print(initLogoz);
   printString((unsigned char*)initLogok);
-  printString((unsigned char*)"\r\nhttp://www.m5stack.com\r\n");
-  printString((unsigned char*)"Basic on the M5Stack library 0.1.2\r\n");
+  printString((unsigned char*)"https://m5stack.com/\r\n");
+  printString((unsigned char*)"Basic on the M5StickC library 0.1.1\r\n");
   printmsg(initmsg);
   // printmsg(initlogo);
 
