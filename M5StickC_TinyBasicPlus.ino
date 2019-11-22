@@ -134,9 +134,17 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 // Set your console D0/D1 baud rate here (9600 baud default)
 #define kConsoleBaud 115200
 
+// support SD Uploader by bye command
+// https://github.com/tobozo/M5Stack-SD-Updater
+#define ENABLE_SD_UPLOADER 1
+//#undef ENABLE_SD_UPLOADER
+
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef ARDUINO
 #include <M5StickC.h>
+#ifdef ENABLE_SD_UPLOADER
+#include <M5StackUpdater.h>
+#endif  // ENABLE_SD_UPLOADER
 #ifndef RAMEND
 // okay, this is a hack for now
 // if we're in here, we're a DUE probably (ARM instead of AVR)
@@ -1237,6 +1245,11 @@ interperateAtTxtpos:
     goto execline;
   case KW_BYE:
     // Leave the basic interperater
+#ifdef ENABLE_SD_UPLOADER
+    Serial.println("Will Load menu binary");
+    updateFromFS(SPIFFS);
+    ESP.restart();
+#endif  // ENABLE_SD_UPLOADER
     return;
 
   case KW_AWRITE:  // AWRITE <pin>, HIGH|LOW
