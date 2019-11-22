@@ -1826,6 +1826,7 @@ save:
     if( SPIFFS.exists( f.c_str() )) {
       SPIFFS.remove( f.c_str() );
     }
+    if(program_start == program_end) goto warmstart;
 
     // open the file, switch over to file output
     fp = SPIFFS.open( f.c_str(), FILE_WRITE );
