@@ -142,6 +142,7 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef ARDUINO
 #include <M5StickC.h>
+#include "tb_display.h"
 #ifdef ENABLE_SD_UPLOADER
 #include <M5StackUpdater.h>
 #endif  // ENABLE_SD_UPLOADER
@@ -678,7 +679,8 @@ static void getln(char prompt)
         break;
       txtpos--;
 
-      printmsgNoNL(backspacemsg);
+//      printmsgNoNL(backspacemsg);
+      outchar(CTRLH);
       break;
     default:
       // We need to leave at least one space to allow us to shuffle the line into order
@@ -1971,7 +1973,8 @@ void setup()
   // Serial.begin(kConsoleBaud);	// opens serial port
   M5.begin();
   Wire.begin(0, 26);  // initialize CardKB HAT I2C
-  termInit();
+  M5.Axp.ScreenBreath(8);   // screen brightness (7-15)
+  tb_display_init(3);
 
   pinMode(M5_BUTTON_HOME, INPUT);
   pinMode(M5_BUTTON_RST, INPUT);
@@ -2013,7 +2016,7 @@ void setup()
   "##     ## ##    ## ##    ##    ##    ##     ## ##    ## ##   ##  \r\n"
   "##     ##  ######   ######     ##    ##     ##  ######  ##    ##";*/
 
-  const unsigned char initLogok[] = 
+  const /*unsigned*/ char initLogok[] = 
   "M5StickC\r\n";
 /*  "##       ## ######## \r\n"
   "###    ### ##       \r\n"
@@ -2051,9 +2054,9 @@ void setup()
 "          GDDD        \r\n";*/
 
   // M5.Lcd.print(initLogoz);
-  printString((unsigned char*)initLogok);
-  printString((unsigned char*)"https://m5stack.com/\r\n");
-  printString((unsigned char*)"Basic on the M5StickC library 0.1.1\r\n");
+  tb_display_print_String(initLogok);
+  tb_display_print_String("https://m5stack.com/\r\n");
+  tb_display_print_String("Basic on the M5StickC library 0.1.1\r\n");
   printmsg(initmsg);
   // printmsg(initlogo);
 
@@ -2221,7 +2224,7 @@ static void outchar(unsigned char c)
   #endif /* ARDUINO */
     // Serial.write(c);
     // M5.Lcd.write(c);
-    termPutchar(c);
+    tb_display_print_char(c);
 
 #else
   putchar(c);
