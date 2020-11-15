@@ -221,7 +221,11 @@ void cmd_Files( void );
 #endif
 
 // CardKB HAT I2C address
-#define CARDKB_ADDR 0x5F
+//#define CARDKB_ADDR 0x5F
+
+// Faces
+#define KEYBOARD_I2C_ADDR     0X08
+#define KEYBOARD_INT          5
 
 ////////////////////
 
@@ -1970,8 +1974,12 @@ static void line_terminator(void)
 void setup()
 {
 #ifdef ARDUINO
-  // Serial.begin(kConsoleBaud);	// opens serial port
+  Serial.begin(kConsoleBaud);	// opens serial port
   M5.begin();
+#ifdef KEYBOARD_I2C_ADDR
+  //M5.Power.begin();
+  pinMode(KEYBOARD_INT, INPUT_PULLUP);
+#endif
   Wire.begin();  // initialize CardKB HAT I2C
 
   //M5.Axp.ScreenBreath(8);   // screen brightness (7-15)
@@ -2169,6 +2177,7 @@ static int inchar()
   default:
     while(1)
     {
+#ifdef CARDKB_ADDR      
       // for CardKB HAT
       Wire.requestFrom(CARDKB_ADDR, 1);
       while(Wire.available())
@@ -2189,6 +2198,31 @@ static int inchar()
         }
       }
       delay(10);
+#else
+# ifdef KEYBOARD_I2C_ADDR
+      if (digitalRead(KEYBOARD_INT) == LOW) {
+        Wire.requestFrom(KEYBOARD_I2C_ADDR, 1);  // request 1 byte from keyboard
+        while (Wire.available()) { 
+          uint8_t c = Wire.read();                  // receive a byte as character
+          if (c != 0) {
+            //TODO convert special chars
+            // cursor (left -> bs)
+            Serial.printf("%02x\n", c);
+            switch (c){
+              case 0x98:
+                c = 0x08;
+                break;
+            }
+
+            if (c < 0x80) { // ASCII String
+              return c;
+            }
+          }
+        }
+      }
+
+# endif
+#endif
     }
   }
   
