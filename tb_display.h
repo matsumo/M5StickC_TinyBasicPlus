@@ -34,10 +34,9 @@ extern boolean tb_display_word_wrap;
 // 2 = Button above
 // 3 = Button left
 // 4 = Button below
-// Display size of M5StickC = 160x80pixel
+// Display size of M5Stack = 320x240pixel
 // With TEXT_HEIGHT=16, the screen can display:
-//    5 rows of text in landscape mode
-//   10 rows of text in portrait mode
+//   15 rows of text in portrait mode
 // =============================================================
 void tb_display_init(int ScreenRotation);
 
