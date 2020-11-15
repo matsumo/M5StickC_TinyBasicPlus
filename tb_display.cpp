@@ -23,7 +23,7 @@
  ******************************************************************************/
 
 #include <Arduino.h>
-#include <M5StickC.h>
+#include <M5Stack.h>
 #include "tb_display.h"
 
 
@@ -31,7 +31,7 @@
 // Textsize 2 is good readable without the need of an microscope.
 // This code only runs with text size 2!
 #define TEXT_SIZE 1//2
-#define TEXT_HEIGHT 8//16 // Height of text to be printed
+#define TEXT_HEIGHT 16 // Height of text to be printed
 // Display size of M5StickC = 160x80
 // With TEXT_HEIGHT=16, the screen can display:
 //    5 rows of text in portrait mode
@@ -77,11 +77,12 @@ void tb_display_init(int ScreenRotation){
   switch (ScreenRotation) {
     case 1: case 3: {
       // 5 rows of text in landscape mode
-      text_buffer_height = 10;//5;
+      text_buffer_height = 15;//5;
       text_buffer_line_length = 120;//60;
       // width of the screen in landscape mode is 160 pixel
       // A small margin on the right side prevent false print results
-      screen_max = 160-2; 
+      //screen_max = 160-2; 
+      screen_max = 320-2; 
       break;
     }
     case 2: case 4: {
@@ -276,4 +277,3 @@ void tb_display_print_String(const char *s, int chr_delay){
       delay(chr_delay);
   }
 }
-

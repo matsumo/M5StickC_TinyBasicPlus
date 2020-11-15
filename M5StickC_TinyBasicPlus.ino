@@ -141,7 +141,7 @@ char eliminateCompileErrors = 1;  // fix to suppress arduino build errors
 
 ////////////////////////////////////////////////////////////////////////////////
 #ifdef ARDUINO
-#include <M5StickC.h>
+#include <M5Stack.h>
 #include "tb_display.h"
 #ifdef ENABLE_SD_UPLOADER
 #include <M5StackUpdater.h>
@@ -221,7 +221,11 @@ void cmd_Files( void );
 #endif
 
 // CardKB HAT I2C address
-#define CARDKB_ADDR 0x5F
+//#define CARDKB_ADDR 0x5F
+
+// Faces
+#define KEYBOARD_I2C_ADDR     0X08
+#define KEYBOARD_INT          5
 
 ////////////////////
 
@@ -462,7 +466,7 @@ static const unsigned char okmsg[]            PROGMEM = "OK";
 static const unsigned char whatmsg[]          PROGMEM = "What? ";
 static const unsigned char howmsg[]           PROGMEM =	"How?";
 static const unsigned char sorrymsg[]         PROGMEM = "Sorry!";
-static const unsigned char initmsg[]          PROGMEM = "TinyBasic Plus " kVersion;
+static const unsigned char initmsg[]          PROGMEM = "M5Stack TinyBasic Plus " kVersion;
 static const unsigned char memorymsg[]        PROGMEM = " bytes free.";
 #ifdef ARDUINO
 #ifdef ENABLE_EEPROM
@@ -1970,14 +1974,26 @@ static void line_terminator(void)
 void setup()
 {
 #ifdef ARDUINO
-  // Serial.begin(kConsoleBaud);	// opens serial port
+  Serial.begin(kConsoleBaud);	// opens serial port
   M5.begin();
-  Wire.begin(0, 26);  // initialize CardKB HAT I2C
-  M5.Axp.ScreenBreath(8);   // screen brightness (7-15)
-  tb_display_init(3);
+#ifdef KEYBOARD_I2C_ADDR
+  //M5.Power.begin();
+  pinMode(KEYBOARD_INT, INPUT_PULLUP);
+#endif
+  Wire.begin();  // initialize CardKB HAT I2C
 
-  pinMode(M5_BUTTON_HOME, INPUT);
-  pinMode(M5_BUTTON_RST, INPUT);
+  //M5.Axp.ScreenBreath(8);   // screen brightness (7-15)
+
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setCursor(1, 10);
+  M5.Lcd.setTextColor(YELLOW);
+  M5.Lcd.setTextSize(2);
+  
+  //tb_display_init(3);
+  tb_display_init(1);
+
+  //pinMode(M5_BUTTON_HOME, INPUT);
+  //pinMode(M5_BUTTON_RST, INPUT);
 
   // while( !Serial ); // for Leonardo
   
@@ -2017,7 +2033,7 @@ void setup()
   "##     ##  ######   ######     ##    ##     ##  ######  ##    ##";*/
 
   const /*unsigned*/ char initLogok[] = 
-  "M5StickC\r\n";
+  "";
 /*  "##       ## ######## \r\n"
   "###    ### ##       \r\n"
   "#### #### ##       \r\n"
@@ -2054,9 +2070,6 @@ void setup()
 "          GDDD        \r\n";*/
 
   // M5.Lcd.print(initLogoz);
-  tb_display_print_String(initLogok);
-  tb_display_print_String("https://m5stack.com/\r\n");
-  tb_display_print_String("Basic on the M5StickC library 0.1.1\r\n");
   printmsg(initmsg);
   // printmsg(initlogo);
 
@@ -2097,10 +2110,17 @@ void setup()
 static unsigned char breakcheck(void)
 {
 #ifdef ARDUINO
+
+  if (M5.BtnC.wasPressed()) {
+    return 1;
+  }
+  return 0;
+/**
   if(digitalRead(M5_BUTTON_RST) == LOW){
     while(digitalRead(M5_BUTTON_RST) == LOW);
     return 1;
   }
+**/
   return 0;
   // Wire.requestFrom(0x88, 1);
   // if(Wire.available())
@@ -2157,6 +2177,7 @@ static int inchar()
   default:
     while(1)
     {
+#ifdef CARDKB_ADDR      
       // for CardKB HAT
       Wire.requestFrom(CARDKB_ADDR, 1);
       while(Wire.available())
@@ -2177,6 +2198,31 @@ static int inchar()
         }
       }
       delay(10);
+#else
+# ifdef KEYBOARD_I2C_ADDR
+      if (digitalRead(KEYBOARD_INT) == LOW) {
+        Wire.requestFrom(KEYBOARD_I2C_ADDR, 1);  // request 1 byte from keyboard
+        while (Wire.available()) { 
+          uint8_t c = Wire.read();                  // receive a byte as character
+          if (c != 0) {
+            //TODO convert special chars
+            // cursor (left -> bs)
+            Serial.printf("%02x\n", c);
+            switch (c){
+              case 0x98:
+                c = 0x08;
+                break;
+            }
+
+            if (c < 0x80) { // ASCII String
+              return c;
+            }
+          }
+        }
+      }
+
+# endif
+#endif
     }
   }
   
